@@ -13,7 +13,7 @@ Open the pod's "Connect" panel and start a Web Terminal (or SSH in).
 2. GET THE CODE
 ---------------
 cd /workspace
-git clone https://github.com/<your-user>/Northstar.git
+git clone https://github.com/jamesEmerson112/Northstar.git
 cd Northstar/drone_management
 
 
