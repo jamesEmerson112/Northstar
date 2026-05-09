@@ -7,7 +7,7 @@
   const TRAIL_MAX = 600;
   const DRONE_PATH = "M0,-12 L8,8 L0,4 L-8,8 Z";
   const ARRIVAL_TOL_M = 8;
-  const NAV_ALT_M = 120;
+  const NAV_ALT_M = 3;
   const ROUTE_THIN_M = 12;
   const ROUTE_MAX_WAYPOINTS = 250;
 
@@ -349,9 +349,7 @@
     map.addListener("click", (e) => {
       if (!$("goto-toggle").checked) return;
       cancelNavigation();
-      const alt = parseFloat(prompt("Goto altitude (m, AGL):", "20"));
-      if (!Number.isFinite(alt) || alt <= 0) return;
-      postCommand("goto", { lat: e.latLng.lat(), lon: e.latLng.lng(), alt_m: alt });
+      postCommand("goto", { lat: e.latLng.lat(), lon: e.latLng.lng(), alt_m: NAV_ALT_M });
     });
 
     wireMapControls();
