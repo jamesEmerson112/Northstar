@@ -63,6 +63,11 @@ class ModeBody(BaseModel):
     mode: Literal["MANUAL", "AUTO", "RTL"]
 
 
+class TeleportBody(BaseModel):
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+
+
 class CommandResult(BaseModel):
     command_id: int
     status: str

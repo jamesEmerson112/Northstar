@@ -64,7 +64,9 @@ The dialect is pinned to `ardupilotmega` and MAVLink v2 via env vars set at the 
 
 ### Dashboard map (Google Maps + Pegman)
 
-The dashboard uses **Google Maps JavaScript API in vector mode** (Leaflet was removed). The browser fetches `GET /api/config` first to retrieve `google_maps_api_key` + `google_maps_map_id`, then dynamically injects the Maps SDK with that key. If the key env var is empty the dashboard surfaces a hint message and skips loading; the rest of the panel keeps functioning. The `mapId` enables Vector + Tilt + Rotation (3D buildings) — created in Google Cloud Console → Map Management. Pegman / Street View is enabled via `streetViewControl: true` and replaces the map area on demand. View toggles in the panel switch between hybrid/roadmap/satellite and flip the tilt 0 ↔ 67.5°.
+The dashboard uses **Google Maps JavaScript API in vector mode** (Leaflet was removed). The browser fetches `GET /api/config` first to retrieve `google_maps_api_key` + `google_maps_map_id`, then dynamically injects the Maps SDK (with `libraries=places`) using that key. If the key env var is empty the dashboard surfaces a hint message and skips loading; the rest of the panel keeps functioning. The `mapId` enables Vector + Tilt + Rotation (3D buildings) — created in Google Cloud Console → Map Management. Pegman / Street View is enabled via `streetViewControl: true` and replaces the map area on demand. View toggles in the panel switch between hybrid/roadmap/satellite and flip the tilt 0 ↔ 67.5°.
+
+The Navigate panel uses **Google Directions API + Places Autocomplete** to plan road-following journeys. Both APIs must be enabled in the same Cloud project that owns the API key. The flow: From + To addresses → POST `/api/drones/{id}/commands/teleport` (sim-only, ferries lat/lon via `MAV_CMD_USER_1`) → DirectionsService.route() → thinned waypoint queue → sequential `goto` posts as the drone reaches each point (ARRIVAL_TOL_M = 8 m). The existing map-click goto stays as a separate "dodge" flow (straight-line, no routing).
 
 ### v2 / out of scope
 

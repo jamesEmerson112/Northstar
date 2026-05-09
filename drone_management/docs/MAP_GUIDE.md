@@ -59,13 +59,27 @@ To put the map back facing north, look for the small compass arrow at the top-ri
 
 ## Tell the drone where to fly
 
-1. In the right panel, find the box that says **Goto on map click** and check it.
-2. Your mouse cursor turns into a crosshair.
-3. Click anywhere on the map where you want the drone to go.
-4. A box pops up asking how high you want the drone to fly. Type a number like `20` (that means 20 meters above the ground) and press OK.
-5. The drone starts flying to that spot.
+There are two ways: a **planned trip** that follows roads, or a **quick move** to dodge.
 
-To stop sending the drone to map clicks, just uncheck the **Goto on map click** box.
+### Plan a trip (drone follows roads)
+
+1. In the right panel find the **Navigate (roads)** box.
+2. Type a starting address in **From**. As you type, suggestions appear — click one.
+3. Type a destination address in **To** and pick a suggestion.
+4. Click **Go**.
+5. The drone instantly jumps to the From spot, a blue line appears showing the road route, and the drone follows it.
+6. When the drone arrives, the blue line disappears.
+7. Click **Cancel** at any time to stop.
+
+### Quick move (dodge)
+
+1. Check the box **Click map to move (dodge)** in the right panel.
+2. Your mouse cursor turns into a crosshair.
+3. Click anywhere on the map.
+4. A box pops up asking how high to fly. Type a number like `20` and press OK.
+5. The drone flies straight there fast — perfect for getting out of the way.
+
+To stop the dodge mode, uncheck the box.
 
 ## Drone command buttons
 

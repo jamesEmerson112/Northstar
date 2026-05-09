@@ -37,8 +37,15 @@
     <button id="mode-apply">Apply</button>
   </div>
   <label class="goto">
-    <input type="checkbox" id="goto-toggle"> Goto on map click
+    <input type="checkbox" id="goto-toggle"> Click map to move (dodge)
   </label>
+  <div class="navigate">
+    <h2>Navigate (roads)</h2>
+    <input type="text" id="nav-from" placeholder="From address" autocomplete="off">
+    <input type="text" id="nav-to" placeholder="To address" autocomplete="off">
+    <button id="nav-go">Go</button>
+    <button id="nav-cancel" class="secondary">Cancel</button>
+  </div>
   <div class="view-toggle">
     <button data-view="hybrid">Hybrid</button>
     <button data-view="roadmap">Map</button>

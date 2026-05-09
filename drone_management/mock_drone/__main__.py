@@ -46,6 +46,8 @@ def handle_command(io: MockMavIO, sim: DroneSim, msg) -> None:
                 ok, status = False, "DENIED"
             else:
                 ok, status = sim.cmd_set_mode(mode)
+        elif cmd == mavutil.mavlink.MAV_CMD_USER_1:
+            ok, status = sim.cmd_teleport(lat=float(msg.param5), lon=float(msg.param6))
         else:
             ok, status = False, "UNSUPPORTED"
         result = {

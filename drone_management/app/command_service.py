@@ -131,6 +131,23 @@ class CommandService:
         await self._finalize(cmd_id, status)
         return cmd_id, status
 
+    async def teleport(
+        self,
+        drone_id: int,
+        target_system: int,
+        target_component: int,
+        *,
+        lat: float, lon: float,
+    ) -> tuple[int, str]:
+        cmd_id = await self._log(drone_id, "teleport", {"lat": lat, "lon": lon})
+        status = await self._send_command_long(
+            target_system, target_component,
+            mavutil.mavlink.MAV_CMD_USER_1,
+            (0, 0, 0, 0, lat, lon, 0),
+        )
+        await self._finalize(cmd_id, status)
+        return cmd_id, status
+
     async def goto(
         self,
         drone_id: int,

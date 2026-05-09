@@ -10,6 +10,13 @@ dt { color: #777; } dd { margin: 0; font-variant-numeric: tabular-nums; }
 .buttons button, .modes button, .view-toggle button { padding: 6px 10px; border: 1px solid #bbb; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
 .buttons button:hover, .modes button:hover, .view-toggle button:hover { background: #eef; }
 .view-toggle button.active { background: #36c; color: #fff; border-color: #36c; }
+.navigate { margin: 12px 0; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; }
+.navigate h2 { font-size: 0.9rem; margin: 0 0 6px; }
+.navigate input { width: 100%; padding: 6px 8px; border: 1px solid #bbb; border-radius: 4px; font-size: 0.85rem; box-sizing: border-box; margin-bottom: 4px; }
+.navigate button { padding: 6px 10px; border: 1px solid #bbb; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-right: 4px; }
+.navigate button:hover { background: #eef; }
+.navigate button.secondary { color: #666; }
+.pac-container { z-index: 10000 !important; }
 .goto { display: block; margin: 8px 0; font-size: 0.85rem; }
 .hint { color: #888; font-size: 0.8rem; margin-top: 12px; }
 .map-tip { color: #888; font-size: 0.75rem; margin: 4px 0 8px; }

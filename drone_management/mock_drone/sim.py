@@ -46,8 +46,8 @@ class DroneSim:
     battery_v: float = 12.6
     yaw_deg: float = 0.0
 
-    horiz_speed_m_s: float = 5.0
-    vert_speed_m_s: float = 2.0
+    horiz_speed_m_s: float = 30.0
+    vert_speed_m_s: float = 5.0
     last_command: str | None = None
 
     def __post_init__(self):
@@ -83,6 +83,14 @@ class DroneSim:
             self.target_lat = self.home_lat
             self.target_lon = self.home_lon
             self.target_alt_m = 0.0
+        return True, "ACCEPTED"
+
+    def cmd_teleport(self, lat: float, lon: float) -> tuple[bool, str]:
+        self.lat = lat
+        self.lon = lon
+        self.target_lat = None
+        self.target_lon = None
+        self.last_command = "teleport"
         return True, "ACCEPTED"
 
     def cmd_goto(self, lat: float, lon: float, alt_m: float) -> tuple[bool, str]:

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .. import command_service as cs_mod
 from ..db import get_session
 from ..models import Command, Drone
-from ..schemas import CommandOut, CommandResult, GotoBody, ModeBody, TakeoffBody
+from ..schemas import CommandOut, CommandResult, GotoBody, ModeBody, TakeoffBody, TeleportBody
 
 
 router = APIRouter(prefix="/api/drones/{drone_id}/commands", tags=["commands"])
@@ -66,6 +66,16 @@ async def cmd_goto(drone_id: int, body: GotoBody, s: AsyncSession = Depends(get_
 async def cmd_mode(drone_id: int, body: ModeBody, s: AsyncSession = Depends(get_session)):
     drone = await _resolve_drone(drone_id, s)
     cid, status = await _service().set_mode(drone.id, drone.system_id, drone.component_id, mode=body.mode)
+    return CommandResult(command_id=cid, status=status)
+
+
+@router.post("/teleport", response_model=CommandResult)
+async def cmd_teleport(drone_id: int, body: TeleportBody, s: AsyncSession = Depends(get_session)):
+    drone = await _resolve_drone(drone_id, s)
+    cid, status = await _service().teleport(
+        drone.id, drone.system_id, drone.component_id,
+        lat=body.lat, lon=body.lon,
+    )
     return CommandResult(command_id=cid, status=status)
 
 
