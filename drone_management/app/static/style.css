@@ -6,9 +6,10 @@ body { display: grid; grid-template-columns: 1fr 320px; height: 100vh; }
 .status { color: #555; font-size: 0.85rem; margin: 0 0 12px; }
 dl { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; font-size: 0.85rem; margin: 0 0 12px; }
 dt { color: #777; } dd { margin: 0; font-variant-numeric: tabular-nums; }
-.buttons, .modes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.buttons button, .modes button { padding: 6px 10px; border: 1px solid #bbb; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-.buttons button:hover, .modes button:hover { background: #eef; }
+.buttons, .modes, .view-toggle { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.buttons button, .modes button, .view-toggle button { padding: 6px 10px; border: 1px solid #bbb; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+.buttons button:hover, .modes button:hover, .view-toggle button:hover { background: #eef; }
+.view-toggle button.active { background: #36c; color: #fff; border-color: #36c; }
 .goto { display: block; margin: 8px 0; font-size: 0.85rem; }
 .hint { color: #888; font-size: 0.8rem; margin-top: 12px; }
 .online { color: #2a8; font-weight: 600; }

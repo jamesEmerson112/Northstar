@@ -64,6 +64,13 @@ def create_app() -> FastAPI:
         async def index():
             return FileResponse(STATIC_DIR / "index.html")
 
+    @app.get("/api/config", include_in_schema=False)
+    async def get_client_config():
+        return {
+            "google_maps_api_key": settings.google_maps_api_key,
+            "google_maps_map_id": settings.google_maps_map_id,
+        }
+
     return app
 
 

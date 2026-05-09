@@ -1,24 +1,22 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  const map = L.map("map").setView([37.7749, -122.4194], 14);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap",
-    maxZoom: 19,
-  }).addTo(map);
+  const DEFAULT_CENTER = { lat: 37.7749, lng: -122.4194 };
+  const DEFAULT_ZOOM = 14;
+  const TILT_DEG = 67.5;
+  const TRAIL_MAX = 600;
+  const DRONE_PATH = "M0,-12 L8,8 L0,4 L-8,8 Z";
 
+  let map = null;
   let marker = null;
-  const trail = L.polyline([], { color: "#36c", weight: 2 }).addTo(map);
-  let droneId = null; // resolved on first telemetry message
+  let trail = null;
+  const trailPath = [];
+  let droneId = null;
   let droneSysId = null;
+  let lastHeading = 0;
 
-  function ensureMarker(latlng) {
-    if (!marker) {
-      marker = L.marker(latlng).addTo(map);
-      map.setView(latlng, map.getZoom());
-    } else {
-      marker.setLatLng(latlng);
-    }
+  function setHint(msg) {
+    $("hint").textContent = msg;
   }
 
   function setOnline(online) {
@@ -29,6 +27,33 @@
 
   function fmt(x, digits = 5) {
     return (x === null || x === undefined) ? "—" : Number(x).toFixed(digits);
+  }
+
+  function droneIcon(heading) {
+    return {
+      path: DRONE_PATH,
+      fillColor: "#ff7a00",
+      fillOpacity: 1,
+      strokeColor: "#222",
+      strokeWeight: 1.2,
+      scale: 1.4,
+      rotation: Number.isFinite(heading) ? heading : 0,
+      anchor: new google.maps.Point(0, 0),
+    };
+  }
+
+  function ensureMarker(position) {
+    if (!marker) {
+      marker = new google.maps.Marker({
+        position,
+        map,
+        icon: droneIcon(lastHeading),
+        title: "drone",
+      });
+      map.panTo(position);
+    } else {
+      marker.setPosition(position);
+    }
   }
 
   function applyTelemetry(p) {
@@ -45,12 +70,19 @@
     $("d-batt").textContent = (p.battery_remaining == null ? "—" : p.battery_remaining) + " %";
     $("d-gps").textContent = (p.satellites == null ? "—" : p.satellites) + " sats";
 
+    if (!map) return;
+
+    if (p.heading_deg != null) {
+      lastHeading = p.heading_deg;
+      if (marker) marker.setIcon(droneIcon(lastHeading));
+    }
+
     if (p.lat != null && p.lon != null) {
-      const ll = [p.lat, p.lon];
+      const ll = { lat: p.lat, lng: p.lon };
       ensureMarker(ll);
-      trail.addLatLng(ll);
-      const latlngs = trail.getLatLngs();
-      if (latlngs.length > 600) trail.setLatLngs(latlngs.slice(-600));
+      trailPath.push(ll);
+      if (trailPath.length > TRAIL_MAX) trailPath.splice(0, trailPath.length - TRAIL_MAX);
+      if (trail) trail.setPath(trailPath);
     }
   }
 
@@ -61,9 +93,9 @@
   function setupSocket() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
     const ws = new WebSocket(`${proto}//${location.host}/ws/telemetry`);
-    ws.onopen = () => $("hint").textContent = "live";
+    ws.onopen = () => setHint("live");
     ws.onclose = () => {
-      $("hint").textContent = "disconnected — retrying…";
+      setHint("disconnected — retrying…");
       setTimeout(setupSocket, 1500);
     };
     ws.onmessage = (evt) => {
@@ -79,7 +111,7 @@
 
   async function postCommand(kind, body) {
     if (droneId == null) {
-      $("hint").textContent = "no drone yet — wait for telemetry";
+      setHint("no drone yet — wait for telemetry");
       return;
     }
     const r = await fetch(`/api/drones/${droneId}/commands/${kind}`, {
@@ -91,29 +123,104 @@
     $("d-ack").textContent = `${kind} → ${data.status ?? r.status}`;
   }
 
-  document.querySelectorAll(".buttons button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const kind = btn.dataset.cmd;
-      if (kind === "takeoff") postCommand(kind, { alt_m: 20 });
-      else if (kind === "goto") return;
-      else postCommand(kind);
+  function wirePanelControls() {
+    document.querySelectorAll(".buttons button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const kind = btn.dataset.cmd;
+        if (kind === "takeoff") postCommand(kind, { alt_m: 20 });
+        else if (kind === "goto") return;
+        else postCommand(kind);
+      });
     });
-  });
 
-  $("mode-apply").addEventListener("click", () => {
-    postCommand("mode", { mode: $("mode-select").value });
-  });
+    $("mode-apply").addEventListener("click", () => {
+      postCommand("mode", { mode: $("mode-select").value });
+    });
 
-  $("goto-toggle").addEventListener("change", (e) => {
-    map.getContainer().style.cursor = e.target.checked ? "crosshair" : "";
-  });
+    $("goto-toggle").addEventListener("change", (e) => {
+      if (!map) return;
+      map.setOptions({ draggableCursor: e.target.checked ? "crosshair" : null });
+    });
+  }
 
-  map.on("click", (e) => {
-    if (!$("goto-toggle").checked) return;
-    const alt = parseFloat(prompt("Goto altitude (m, AGL):", "20"));
-    if (!Number.isFinite(alt) || alt <= 0) return;
-    postCommand("goto", { lat: e.latlng.lat, lon: e.latlng.lng, alt_m: alt });
-  });
+  function wireMapControls() {
+    const viewButtons = document.querySelectorAll(".view-toggle button[data-view]");
+    function setActiveView(name) {
+      viewButtons.forEach((b) => b.classList.toggle("active", b.dataset.view === name));
+    }
+    viewButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.view;
+        map.setMapTypeId(v);
+        setActiveView(v);
+      });
+    });
+    setActiveView("hybrid");
 
-  setupSocket();
+    $("tilt-toggle").addEventListener("click", () => {
+      const cur = map.getTilt() || 0;
+      map.setTilt(cur > 0 ? 0 : TILT_DEG);
+      $("tilt-toggle").classList.toggle("active", (map.getTilt() || 0) > 0);
+    });
+  }
+
+  window.initMap = function initMap() {
+    const mapOptions = {
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
+      mapTypeId: "hybrid",
+      tilt: 0,
+      streetViewControl: true,
+      fullscreenControl: false,
+      mapTypeControl: false,
+    };
+    if (window.__GMAP_MAP_ID__) mapOptions.mapId = window.__GMAP_MAP_ID__;
+
+    map = new google.maps.Map($("map"), mapOptions);
+
+    trail = new google.maps.Polyline({
+      path: trailPath,
+      strokeColor: "#36c",
+      strokeOpacity: 0.9,
+      strokeWeight: 2,
+      map,
+    });
+
+    map.addListener("click", (e) => {
+      if (!$("goto-toggle").checked) return;
+      const alt = parseFloat(prompt("Goto altitude (m, AGL):", "20"));
+      if (!Number.isFinite(alt) || alt <= 0) return;
+      postCommand("goto", { lat: e.latLng.lat(), lon: e.latLng.lng(), alt_m: alt });
+    });
+
+    wireMapControls();
+    setupSocket();
+  };
+
+  async function bootstrap() {
+    wirePanelControls();
+    setHint("loading map…");
+    let cfg;
+    try {
+      const r = await fetch("/api/config");
+      cfg = await r.json();
+    } catch (e) {
+      setHint("could not load /api/config");
+      return;
+    }
+    if (!cfg.google_maps_api_key) {
+      setHint("GOOGLE_MAPS_API_KEY not set on server");
+      return;
+    }
+    if (cfg.google_maps_map_id) window.__GMAP_MAP_ID__ = cfg.google_maps_map_id;
+
+    const s = document.createElement("script");
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(cfg.google_maps_api_key)}&v=weekly&callback=initMap`;
+    s.async = true;
+    s.defer = true;
+    s.onerror = () => setHint("failed to load Google Maps script");
+    document.head.appendChild(s);
+  }
+
+  bootstrap();
 })();

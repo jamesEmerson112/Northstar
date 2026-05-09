@@ -1,0 +1,13 @@
+1. enhance the map (turn building into obstacles, make the map less noise)
+2. deploy on Nemoclaw to run autonomously
+3. integrate CUA model and test running it (prioritize)
+4. build optimization for CUA model (a brain model like gemini to process prompt then feed outputs into CUA model) (prioritize)
+5. multiple drones?
+6. latency recording (live dashboard for latency/performance to see if the drone reaches destination and how long) (prioritize)
+7. Add moving obstacles (drone dodging moving obstacles (prioritize))
+8. Add Street Live View
+8a. add LLM to create a list of address going from A to B
+8b. Have CUA model to go into Street Live View
+8c. test it navigating through the street
+9. (frontend GPU level 2) replace flat drone marker with a Three.js 3D drone model overlaid on Google Maps via WebGLOverlayView; rotate it with roll/pitch/yaw from telemetry so it visibly banks during goto; render altitude in 3D space.
+10. (frontend GPU level 3) replace the polyline trail with a deck.gl PathLayer or ArcLayer; encode altitude as a 3D ribbon and speed as color (GPU-instanced rendering).

@@ -18,5 +18,10 @@ class Settings(BaseSettings):
     gcs_system_id: int = Field(default=255, alias="GCS_SYSTEM_ID")
     gcs_component_id: int = Field(default=190, alias="GCS_COMPONENT_ID")
 
+    google_maps_api_key: str = Field(default="", alias="GOOGLE_MAPS_API_KEY")
+    google_maps_map_id: str = Field(default="", alias="GOOGLE_MAPS_MAP_ID")
+
+    google_maps_api_key: str = Field(default="", alias="GOOGLE_MAPS_API_KEY")
+
 
 settings = Settings()

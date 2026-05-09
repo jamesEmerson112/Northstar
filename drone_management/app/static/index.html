@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Drone Management</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin="">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -42,11 +39,14 @@
   <label class="goto">
     <input type="checkbox" id="goto-toggle"> Goto on map click
   </label>
+  <div class="view-toggle">
+    <button data-view="hybrid">Hybrid</button>
+    <button data-view="roadmap">Map</button>
+    <button data-view="satellite">Satellite</button>
+    <button id="tilt-toggle">Tilt 3D</button>
+  </div>
   <p class="hint" id="hint">connecting…</p>
 </aside>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
 <script src="/static/app.js"></script>
 </body>
 </html>

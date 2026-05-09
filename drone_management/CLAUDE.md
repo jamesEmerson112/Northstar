@@ -19,7 +19,7 @@ All commands assume the venv is active (`source .venv/bin/activate`) and you are
 
 The service serves the dashboard at `/` and the OpenAPI docs at `/docs`.
 
-Configuration is via env vars or `.env` (see `.env.example`). Notable: `DB_URL`, `MAVLINK_BIND_PORT` (service listens for telemetry), `DRONE_PORT` (mock drone listens for commands), `HTTP_HOST`/`HTTP_PORT`.
+Configuration is via env vars or `.env` (see `.env.example`). Notable: `DB_URL`, `MAVLINK_BIND_PORT` (service listens for telemetry), `DRONE_PORT` (mock drone listens for commands), `HTTP_HOST`/`HTTP_PORT`, `GOOGLE_MAPS_API_KEY` + `GOOGLE_MAPS_MAP_ID` (dashboard map).
 
 For deployment to a remote pod see `RUNPOD_INSTRUCTIONS.txt`.
 
@@ -61,6 +61,10 @@ To keep DB volume sane, telemetry rows are persisted only on `HEARTBEAT` (1 Hz) 
 ### MAVLink dialect
 
 The dialect is pinned to `ardupilotmega` and MAVLink v2 via env vars set at the top of `mavlink_link.py` and `mock_drone/mav_io.py` (`MAVLINK_DIALECT=ardupilotmega`, `MAVLINK20=1`) **before** any pymavlink import. Custom mode integers used (`MANUAL=0`, `AUTO=10`, `RTL=6`) are ArduPilot-specific — switching to PX4 requires changing both the service's `ARDUPILOT_MODE_BY_INT` (in `telemetry_bus.py`) and the sim's `Mode` enum.
+
+### Dashboard map (Google Maps + Pegman)
+
+The dashboard uses **Google Maps JavaScript API in vector mode** (Leaflet was removed). The browser fetches `GET /api/config` first to retrieve `google_maps_api_key` + `google_maps_map_id`, then dynamically injects the Maps SDK with that key. If the key env var is empty the dashboard surfaces a hint message and skips loading; the rest of the panel keeps functioning. The `mapId` enables Vector + Tilt + Rotation (3D buildings) — created in Google Cloud Console → Map Management. Pegman / Street View is enabled via `streetViewControl: true` and replaces the map area on demand. View toggles in the panel switch between hybrid/roadmap/satellite and flip the tilt 0 ↔ 67.5°.
 
 ### v2 / out of scope
 
