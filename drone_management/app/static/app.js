@@ -119,6 +119,21 @@
     $("d-ack").textContent = `${ack.command_id ?? "?"} → ${ack.status}`;
   }
 
+  function applyCuaStep(msg) {
+    const statusEl = $("cua-status");
+    statusEl.textContent = msg.status ?? "step";
+    statusEl.className = `cua-status cua-${msg.status ?? "step"}`;
+    if (msg.task) $("cua-task").textContent = msg.task;
+    if (msg.action_label) $("cua-action").textContent = `[${msg.step}] ${msg.action_label}`;
+    if (msg.error) $("cua-action").textContent = `error: ${msg.error}`;
+    if (msg.screenshot_b64) {
+      const t0 = $("cua-thumb-0"), t1 = $("cua-thumb-1"), t2 = $("cua-thumb-2");
+      t2.src = t1.src || "";
+      t1.src = t0.src || "";
+      t0.src = `data:image/png;base64,${msg.screenshot_b64}`;
+    }
+  }
+
   function setupSocket() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
     const ws = new WebSocket(`${proto}//${location.host}/ws/telemetry`);
@@ -132,6 +147,7 @@
         const msg = JSON.parse(evt.data);
         if (msg.type === "telemetry" || msg.type === "snapshot") applyTelemetry(msg);
         else if (msg.type === "command_ack") applyAck(msg);
+        else if (msg.type === "cua_step") applyCuaStep(msg);
       } catch (e) {
         console.error(e);
       }

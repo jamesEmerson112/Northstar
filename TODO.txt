@@ -1,6 +1,6 @@
 1. enhance the map (turn building into obstacles, make the map less noise)
 2. deploy on Nemoclaw to run autonomously
-3. integrate CUA model and test running it (prioritize)
+3. integrate CUA model and test running it (in progress — see drone_management/cua/ + docs/CUA_DEMO.md)
 4. build optimization for CUA model (a brain model like gemini to process prompt then feed outputs into CUA model) (prioritize)
 5. multiple drones?
 6. latency recording (live dashboard for latency/performance to see if the drone reaches destination and how long) (prioritize)

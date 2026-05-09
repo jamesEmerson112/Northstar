@@ -12,6 +12,7 @@ from . import command_service as cs_mod
 from .config import settings  # noqa: F401  ensure env loaded
 from .mavlink_link import MavlinkLink
 from .routers import commands as commands_router
+from .routers import cua as cua_router
 from .routers import drones as drones_router
 from .routers import ws as ws_router
 from .telemetry_bus import bus
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(drones_router.router)
     app.include_router(commands_router.router)
     app.include_router(ws_router.router)
+    app.include_router(cua_router.router)
 
     if STATIC_DIR.exists():
         app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
