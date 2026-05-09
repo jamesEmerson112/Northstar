@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drone Management</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div id="map"></div>
+<aside id="panel">
+  <h1>Drone <span id="d-id">—</span></h1>
+  <p class="status"><span id="d-online">offline</span> · mode <span id="d-mode">—</span> · armed <span id="d-armed">—</span></p>
+  <dl>
+    <dt>lat</dt><dd id="d-lat">—</dd>
+    <dt>lon</dt><dd id="d-lon">—</dd>
+    <dt>alt (rel)</dt><dd id="d-alt">— m</dd>
+    <dt>heading</dt><dd id="d-hdg">— °</dd>
+    <dt>battery</dt><dd id="d-batt">— %</dd>
+    <dt>gps</dt><dd id="d-gps">— sats</dd>
+    <dt>last cmd ack</dt><dd id="d-ack">—</dd>
+  </dl>
+  <div class="buttons">
+    <button data-cmd="arm">Arm</button>
+    <button data-cmd="disarm">Disarm</button>
+    <button data-cmd="takeoff">Takeoff (20 m)</button>
+    <button data-cmd="land">Land</button>
+  </div>
+  <div class="modes">
+    <label>Mode
+      <select id="mode-select">
+        <option value="MANUAL">MANUAL</option>
+        <option value="AUTO">AUTO</option>
+        <option value="RTL">RTL</option>
+      </select>
+    </label>
+    <button id="mode-apply">Apply</button>
+  </div>
+  <label class="goto">
+    <input type="checkbox" id="goto-toggle"> Goto on map click
+  </label>
+  <p class="hint" id="hint">connecting…</p>
+</aside>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

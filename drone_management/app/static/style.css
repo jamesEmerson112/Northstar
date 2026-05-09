@@ -1,0 +1,15 @@
+html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, system-ui, sans-serif; }
+body { display: grid; grid-template-columns: 1fr 320px; height: 100vh; }
+#map { height: 100%; }
+#panel { padding: 16px; background: #f7f7fa; overflow-y: auto; border-left: 1px solid #ddd; }
+#panel h1 { font-size: 1rem; margin: 0 0 4px; }
+.status { color: #555; font-size: 0.85rem; margin: 0 0 12px; }
+dl { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; font-size: 0.85rem; margin: 0 0 12px; }
+dt { color: #777; } dd { margin: 0; font-variant-numeric: tabular-nums; }
+.buttons, .modes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.buttons button, .modes button { padding: 6px 10px; border: 1px solid #bbb; background: #fff; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+.buttons button:hover, .modes button:hover { background: #eef; }
+.goto { display: block; margin: 8px 0; font-size: 0.85rem; }
+.hint { color: #888; font-size: 0.8rem; margin-top: 12px; }
+.online { color: #2a8; font-weight: 600; }
+.offline { color: #c33; font-weight: 600; }

@@ -1,0 +1,71 @@
+RUNPOD POD SETTINGS
+-------------------
+Image:          runpod/pytorch:2.4.0-py3.11-cuda12.4.1   (or any python>=3.11)
+Volume mount:   /workspace
+Exposed port:   8000 (HTTP)
+
+
+1. CONNECT TO THE POD
+---------------------
+Open the pod's "Connect" panel and start a Web Terminal (or SSH in).
+
+
+2. GET THE CODE
+---------------
+cd /workspace
+git clone https://github.com/<your-user>/Northstar.git
+cd Northstar/drone_management
+
+
+3. SET UP PYTHON
+----------------
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -e ".[dev]"
+
+
+4. WRITE .env
+-------------
+cat > .env <<'EOF'
+DB_URL=sqlite+aiosqlite:////workspace/drone_management.db
+HTTP_HOST=0.0.0.0
+HTTP_PORT=8000
+MAVLINK_BIND_HOST=127.0.0.1
+MAVLINK_BIND_PORT=14550
+DRONE_HOST=127.0.0.1
+DRONE_PORT=14551
+MAVLINK20=1
+MAVLINK_DIALECT=ardupilotmega
+EOF
+
+
+5. INIT DB
+----------
+alembic upgrade head
+
+
+6. START BOTH PROCESSES (tmux)
+------------------------------
+apt-get update && apt-get install -y tmux
+tmux new -s drone -d
+tmux send-keys -t drone "cd /workspace/Northstar/drone_management && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000" C-m
+tmux split-window -t drone -h
+tmux send-keys -t drone "cd /workspace/Northstar/drone_management && source .venv/bin/activate && python -m mock_drone --target 127.0.0.1:14550 --listen 0.0.0.0:14551" C-m
+
+
+7. OPEN THE DASHBOARD
+---------------------
+https://<pod-id>-8000.proxy.runpod.net
+
+
+8. SMOKE TEST (optional, from the pod shell)
+--------------------------------------------
+curl -s http://127.0.0.1:8000/api/drones | python3 -m json.tool
+curl -s -X POST http://127.0.0.1:8000/api/drones/1/commands/arm
+curl -s -X POST http://127.0.0.1:8000/api/drones/1/commands/takeoff -H 'content-type: application/json' -d '{"alt_m":20}'
+
+
+9. STOP
+-------
+tmux kill-session -t drone
