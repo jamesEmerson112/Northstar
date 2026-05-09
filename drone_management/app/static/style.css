@@ -12,5 +12,7 @@ dt { color: #777; } dd { margin: 0; font-variant-numeric: tabular-nums; }
 .view-toggle button.active { background: #36c; color: #fff; border-color: #36c; }
 .goto { display: block; margin: 8px 0; font-size: 0.85rem; }
 .hint { color: #888; font-size: 0.8rem; margin-top: 12px; }
+.map-tip { color: #888; font-size: 0.75rem; margin: 4px 0 8px; }
+.map-tip kbd { background: #eee; border: 1px solid #ccc; border-radius: 3px; padding: 0 4px; font-family: inherit; font-size: 0.75rem; }
 .online { color: #2a8; font-weight: 600; }
 .offline { color: #c33; font-weight: 600; }
