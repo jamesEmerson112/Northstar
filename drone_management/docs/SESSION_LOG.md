@@ -1,4 +1,4 @@
-Last updated: 2026-05-09
+Last updated: 2026-05-09 (rev 2)
 
 # Session Log
 
@@ -83,6 +83,33 @@ Open `http://127.0.0.1:8000/`. Tests: `pytest -q`.
 - Start both processes in a tmux session: pane 1 runs `uvicorn ...`, pane 2 runs `python -m mock_drone --target 127.0.0.1:14550 --listen 0.0.0.0:14551`.
 - Reach the dashboard at `https://<pod-id>-8000.proxy.runpod.net`.
 
+#### Public dashboard URL via the pod's HTTP proxy
+
+Adding `8000` to the pod's **Expose HTTP Ports** setting (alongside `8888` for Jupyter) makes the Connect tab show `Port 8000 → HTTP Service` as Ready. The URL `https://<pod-id>-8000.proxy.runpod.net` is then reachable from any browser without an SSH tunnel.
+
+Caveat: the dashboard ships with **no auth**. Anyone holding the URL can call `POST /api/drones/.../commands/arm` (and every other command). Acceptable for the planned CUA experiments; for production this needs a token or auth layer.
+
+#### Pod-restart recovery
+
+A RunPod stop/start preserves `/workspace` (so `.venv` and `.env` survive) but kills every running process and resets some in-memory state. After a restart, re-run:
+
+```
+apt-get update && apt-get install -y tmux
+cd /workspace/Northstar/drone_management && source .venv/bin/activate && alembic upgrade head
+# then re-create the tmux session per RUNPOD_INSTRUCTIONS.txt step 6
+```
+
+#### Pod-restart DNS gotcha
+
+After a restart, `/etc/resolv.conf` came back pointed at `nameserver 127.0.0.11` (Docker's internal resolver) and external DNS lookups failed (`Could not resolve host: github.com`). Fix:
+
+```
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+```
+
+This override is in-memory only and may need to be re-applied after future restarts.
+
 #### SSH key setup (the gotcha)
 
 RunPod offers two SSH forms and they use different keys:
@@ -122,3 +149,15 @@ Stop with `tmux kill-session -t drone`.
 - Multi-drone (`TODO.txt` #5) — bus already keys on `system_id`, but the dashboard panel and command routes assume a single drone.
 - Google Maps API key restriction (HTTP referrer / API restriction in Cloud Console) — currently the key is served openly via `/api/config` to any browser hitting the dashboard.
 - Latency dashboard (`TODO.txt` #6), moving obstacles (`TODO.txt` #7), Street-Live-View autonomous navigation with CUA + LLM (`TODO.txt` #3, #4, #8), Nemoclaw autonomous deploy (`TODO.txt` #2), building-as-obstacle map cleanup (`TODO.txt` #1).
+- Rust backend latency benchmark (`TODO.txt` #11) — split-screen dashboard with the current FastAPI (Python) on the left and a Rust backend (axum + tokio + mavlink crate) on the right; both subscribe to the same mock drone (multi-target UDP), each fans out telemetry on its own port (8000 / 9000) with its own `google.maps.Map` and WebSocket; t_ingest / t_emit / t_recv timestamps drive p50 + p99 badges per pane (backend processing, end-to-end, jitter). Scope: telemetry + commands, no DB on the Rust side; deploy on RunPod with both ports exposed.
+
+## 9. Recent additions (post-Level-1)
+
+Captured during the second half of the 2026-05-09 session:
+
+- **Public dashboard URL.** Pod now exposes `8000` via RunPod's HTTP proxy (alongside `8888` for Jupyter); `https://<pod-id>-8000.proxy.runpod.net` is reachable from any browser without an SSH tunnel. No auth on the dashboard — anyone with the URL can issue commands. Fine for CUA experiments, not production. (See **Deployment story → Public dashboard URL**.)
+- **Pod-restart DNS gotcha.** After a stop/start, `/etc/resolv.conf` was set to `nameserver 127.0.0.11` (Docker's internal resolver) and external DNS broke. Workaround is to write `nameserver 8.8.8.8` / `1.1.1.1` into `/etc/resolv.conf`; it's in-memory only and may recur. (See **Deployment story → Pod-restart DNS gotcha**.)
+- **Pod-restart recovery sequence.** `/workspace` survives but processes don't. Re-install tmux, re-activate venv, run `alembic upgrade head`, re-create the tmux session per `RUNPOD_INSTRUCTIONS.txt` step 6. (See **Deployment story → Pod-restart recovery**.)
+- **CLAUDE.md location decision.** `drone_management/CLAUDE.md` stays where it is (deep, drone-specific). No top-level `Northstar/CLAUDE.md` is being added — the parent repo also contains unrelated CUA / Lightcone work, and we don't want to mix project guidance.
+- **`docs/MAP_GUIDE.md` added.** Kid-friendly walkthrough of the dashboard (Pegman, Tilt 3D, goto, what the numbers mean) for non-technical users. Already linked from **Useful pointers**.
+- **TODO additions captured.** `TODO.txt` now includes #9 (Three.js 3D drone overlay via WebGLOverlayView), #10 (deck.gl trail layer), and #11 (Python-vs-Rust split-screen latency benchmark on RunPod). All three tracked in **Deferred / out of scope**.
