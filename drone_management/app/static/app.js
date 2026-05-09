@@ -7,9 +7,9 @@
   const TRAIL_MAX = 600;
   const DRONE_PATH = "M0,-12 L8,8 L0,4 L-8,8 Z";
   const ARRIVAL_TOL_M = 8;
-  const NAV_ALT_M = 20;
-  const ROUTE_THIN_M = 30;
-  const ROUTE_MAX_WAYPOINTS = 100;
+  const NAV_ALT_M = 120;
+  const ROUTE_THIN_M = 12;
+  const ROUTE_MAX_WAYPOINTS = 250;
 
   let map = null;
   let marker = null;
@@ -227,12 +227,24 @@
       return;
     }
     const route = result?.routes?.[0];
-    if (!route || !route.overview_path?.length) {
+    if (!route) {
       setHint("no route found");
       return;
     }
 
-    const path = thinPath(route.overview_path);
+    // Use the denser per-step path so the drone follows actual road curvature.
+    // overview_path is too sparse — chords between widely spaced points cut through buildings.
+    const stepLatLngs = [];
+    for (const leg of route.legs ?? []) {
+      for (const step of leg.steps ?? []) {
+        const stepPath = step.path ?? [];
+        for (const p of stepPath) stepLatLngs.push(p);
+      }
+    }
+    const sourceLatLngs = stepLatLngs.length ? stepLatLngs : (route.overview_path ?? []);
+    if (sourceLatLngs.length === 0) { setHint("empty route"); return; }
+
+    const path = thinPath(sourceLatLngs);
     if (path.length === 0) { setHint("empty route"); return; }
 
     plannedPolyline = new google.maps.Polyline({
