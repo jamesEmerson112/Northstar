@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@onkernel/sdk": "^0.52.0",
+    "@tzafon/lightcone": "^0.14.0"
+  }
+}

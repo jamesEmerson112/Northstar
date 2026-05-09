@@ -1,0 +1,13 @@
+{
+  "confidence": "low",
+  "evidence": [],
+  "latitude": null,
+  "longitude": null,
+  "maps_url": null,
+  "status": "blocked",
+  "summary": "The agent did not submit a location before the run ended.",
+  "uncertainties": [
+    "Reached the max step budget of 50 without a submit_location call.",
+    "I need to find the exact location from the target image. The target image shows a street scene with trees on the left and a large white building on the right. I should search for a more specific location. Let me try searching for a specific street or neighborhood in Omaha that might match this scene.\n\nI'll search for \"Omaha residential street\" to get more specific results and see if I can find a matching location."
+  ]
+}
