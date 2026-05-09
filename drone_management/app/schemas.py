@@ -68,16 +68,6 @@ class TeleportBody(BaseModel):
     lon: float = Field(ge=-180, le=180)
 
 
-class CuaStepBody(BaseModel):
-    run_id: str
-    step: int
-    status: Literal["start", "step", "done", "error"]
-    task: str | None = None
-    action_label: str | None = None
-    screenshot_b64: str | None = None
-    error: str | None = None
-
-
 class CommandResult(BaseModel):
     command_id: int
     status: str

@@ -17,17 +17,6 @@ dt { color: #777; } dd { margin: 0; font-variant-numeric: tabular-nums; }
 .navigate button:hover { background: #eef; }
 .navigate button.secondary { color: #666; }
 .pac-container { z-index: 10000 !important; }
-.cua { margin: 12px 0; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; }
-.cua h2 { font-size: 0.9rem; margin: 0 0 6px; }
-.cua-status { font-size: 0.75rem; color: #888; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-.cua-status.cua-start, .cua-status.cua-step { color: #36c; }
-.cua-status.cua-done { color: #2a8; }
-.cua-status.cua-error { color: #c33; }
-.cua-task { font-size: 0.8rem; color: #444; margin: 0 0 4px; font-style: italic; word-wrap: break-word; }
-.cua-action { font-size: 0.8rem; margin: 0 0 6px; font-family: ui-monospace, monospace; color: #222; word-wrap: break-word; }
-.cua-thumbs { display: flex; gap: 4px; align-items: flex-end; }
-.cua-thumbs img { width: 64px; height: 36px; object-fit: cover; border: 1px solid #ccc; border-radius: 2px; background: #eee; }
-.cua-thumbs img:first-child { width: 96px; height: 54px; border-color: #36c; }
 .goto { display: block; margin: 8px 0; font-size: 0.85rem; }
 .hint { color: #888; font-size: 0.8rem; margin-top: 12px; }
 .map-tip { color: #888; font-size: 0.75rem; margin: 4px 0 8px; }

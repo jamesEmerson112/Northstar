@@ -68,20 +68,6 @@ The dashboard uses **Google Maps JavaScript API in vector mode** (Leaflet was re
 
 The Navigate panel uses **Google Directions API + Places Autocomplete** to plan road-following journeys. Both APIs must be enabled in the same Cloud project that owns the API key. The flow: From + To addresses → POST `/api/drones/{id}/commands/teleport` (sim-only, ferries lat/lon via `MAV_CMD_USER_1`) → DirectionsService.route() → thinned waypoint queue → sequential `goto` posts as the drone reaches each point (ARRIVAL_TOL_M = 8 m). The existing map-click goto stays as a separate "dodge" flow (straight-line, no routing).
 
-### CUA (Northstar) integration
-
-The `cua/` package lives next to `app/` and `mock_drone/`. It runs on the user's Mac (CLI: `python -m cua "<goal>"` from `drone_management/`) and drives the **public** dashboard URL through a Lightcone-hosted virtual desktop using the `tzafon.northstar-cua-fast` model. Each CUA step (annotated PNG + action label) is POSTed to `/api/cua/step`, broadcast over the existing telemetry bus as `{"type": "cua_step", ...}`, and rendered in the right-side **Northstar (CUA)** panel.
-
-Files of note:
-- `cua/runner.py` — the CUA loop (ported from `Northstar/_cua.py` + `Northstar/visualize.py`).
-- `cua/annotate.py` — PIL-based screenshot annotation (red circle on click, banner on type/key/navigate).
-- `cua/streamer.py` — best-effort POST client; never raises on failure.
-- `cua/tasks.py` — three pre-canned demo tasks (takeoff-land, sf-tour, street-view).
-- `app/routers/cua.py` — `POST /api/cua/step` endpoint.
-- `docs/CUA_DEMO.md` — operator guide and troubleshooting.
-
-Install on Mac: `pip install -e ".[cua,dev]"`. Pod doesn't need the `[cua]` extra; only the `/api/cua/step` endpoint and dashboard panel changes need to be deployed there.
-
 ### v2 / out of scope
 
 ALFA dataset replay (CSV-based, no ROS) and GPU-backed anomaly detection are documented in `RUNPOD_INSTRUCTIONS.txt` and the plan file under `~/.claude/plans/`. v1 deliberately excludes both. The service is designed to host a future `app/alfa_replay.py` ingestor that pushes synthetic frames through `bus.ingest` — preserve that entry point when refactoring.
