@@ -57,6 +57,15 @@ tmux split-window -t drone -h
 tmux send-keys -t drone "cd /workspace/Northstar/drone_management && source .venv/bin/activate && python -m mock_drone --target 127.0.0.1:14550 --listen 0.0.0.0:14551" C-m
 
 
+6a. SHORTCUT (after first-time setup, or after pod restart)
+-----------------------------------------------------------
+bash scripts/restart.sh                            # quick restart of tmux only
+bash scripts/restart.sh --pull                     # git pull then restart
+bash scripts/restart.sh --fresh                    # apt + tmux + alembic + restart (post pod-restart)
+bash scripts/restart.sh --dns                      # rewrite /etc/resolv.conf to public DNS first
+bash scripts/restart.sh --fresh --pull --dns       # full nuclear option
+
+
 7. OPEN THE DASHBOARD
 ---------------------
 https://<pod-id>-8000.proxy.runpod.net
