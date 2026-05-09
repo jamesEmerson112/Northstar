@@ -31,8 +31,8 @@ class DroneSim:
     All distances are meters, angles are degrees on the public surface.
     Updates are deterministic per `tick(dt)` call so tests can step it.
     """
-    home_lat: float = 37.7749
-    home_lon: float = -122.4194
+    home_lat: float = 37.77927
+    home_lon: float = -122.41924
     lat: float = field(init=False)
     lon: float = field(init=False)
     alt_m: float = 0.0

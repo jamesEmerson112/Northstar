@@ -1,7 +1,7 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  const DEFAULT_CENTER = { lat: 37.7749, lng: -122.4194 };
+  const DEFAULT_CENTER = { lat: 37.77927, lng: -122.41924 };
   const DEFAULT_ZOOM = 14;
   const TILT_DEG = 67.5;
   const TRAIL_MAX = 600;

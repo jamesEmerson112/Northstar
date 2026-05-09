@@ -20,7 +20,7 @@ def parse_args():
                    help="host:port to listen for commands on")
     p.add_argument("--system-id", type=int, default=1)
     p.add_argument("--component-id", type=int, default=1)
-    p.add_argument("--home", default="37.7749,-122.4194", help="home lat,lon")
+    p.add_argument("--home", default="37.77927,-122.41924", help="home lat,lon")
     return p.parse_args()
 
 
