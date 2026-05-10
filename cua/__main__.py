@@ -8,10 +8,11 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
-from . import runner
+from . import dashboard, runner
 from .tasks import ALL as DEMO_TASKS
 
 DEFAULT_DASHBOARD_URL = "https://un5nmdhn7f29dw-8000.proxy.runpod.net"
@@ -50,6 +51,12 @@ def main(argv: list[str] | None = None) -> int:
                         default=os.getenv("DASHBOARD_URL", DEFAULT_DASHBOARD_URL).rstrip("/"))
     parser.add_argument("--max-steps", type=int, default=30)
     parser.add_argument("--output-dir", default=str(NORTHSTAR_ROOT / "cua_runs"))
+    parser.add_argument("--port", type=int, default=9090,
+                        help="local CUA viewer dashboard port (default 9090)")
+    parser.add_argument("--no-open", action="store_true",
+                        help="don't auto-open the browser")
+    parser.add_argument("--no-dashboard", action="store_true",
+                        help="skip the local viewer dashboard entirely")
     args = parser.parse_args(argv)
 
     if not args.goal and not args.demo:
@@ -67,12 +74,28 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(args.output_dir) / datetime.now().strftime("%Y%m%d-%H%M%S")
     out.mkdir(parents=True, exist_ok=True)
 
-    runner.run(
-        goal=goal,
-        dashboard_url=args.dashboard_url,
-        output_dir=out,
-        max_steps=args.max_steps,
-    )
+    if not args.no_dashboard:
+        try:
+            dashboard.start_server(port=args.port, open_browser=not args.no_open)
+        except Exception as e:
+            print(f"[main] could not start local dashboard: {e}", file=sys.stderr)
+
+    try:
+        runner.run(
+            goal=goal,
+            dashboard_url=args.dashboard_url,
+            output_dir=out,
+            max_steps=args.max_steps,
+        )
+    finally:
+        if not args.no_dashboard:
+            print(f"\n[main] CUA finished. Dashboard still live at http://localhost:{args.port}")
+            print("[main] Press Ctrl-C to exit.")
+            try:
+                while True:
+                    time.sleep(60)
+            except KeyboardInterrupt:
+                print("\n[main] bye.")
     return 0
 
 

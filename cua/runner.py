@@ -8,6 +8,7 @@ This is standalone — it does NOT import from drone_management/.
 """
 from __future__ import annotations
 
+import base64
 import time
 from io import BytesIO
 from pathlib import Path
@@ -26,6 +27,19 @@ from _cua import (
     is_done,
     is_terminal_action,
 )
+
+from . import dashboard
+
+
+def _to_thumb_b64(img: Image.Image, max_width: int = 640) -> str:
+    if img.width > max_width:
+        ratio = max_width / img.width
+        thumb = img.resize((max_width, int(img.height * ratio)))
+    else:
+        thumb = img
+    buf = BytesIO()
+    thumb.save(buf, format="PNG", optimize=True)
+    return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
 def annotate_screenshot(screenshot_url: str, action: dict, step: int) -> Image.Image:
@@ -81,6 +95,22 @@ def run(
     print(f"[runner] dashboard={dashboard_url}")
     print(f"[runner] output={output_dir}")
 
+    dashboard.publish({
+        "type": "start",
+        "task": goal,
+        "max_steps": max_steps,
+        "dashboard_url": dashboard_url,
+    })
+
+    try:
+        _do_run(goal, dashboard_url, output_dir, max_steps, display_width, display_height)
+    except Exception as e:
+        print(f"[runner] fatal: {e}")
+        dashboard.publish({"type": "error", "message": str(e)})
+        raise
+
+
+def _do_run(goal, dashboard_url, output_dir, max_steps, display_width, display_height):
     tool = {
         "type": "computer_use",
         "display_width": display_width,
@@ -113,29 +143,41 @@ def run(
             items.extend(response.output or [])
             for text in get_messages(response.output):
                 print(f"[runner] northstar: {text}")
+                dashboard.publish({"type": "message", "step": step, "text": text})
 
             if is_done(response.output):
                 print(f"[runner] done at step {step}")
+                dashboard.publish({"type": "done", "total_steps": step})
                 return
 
             calls, call_ids = get_computer_calls(response.output, tool)
             if not calls:
                 print(f"[runner] no actions at step {step} — exiting")
+                dashboard.publish({"type": "done", "total_steps": step})
                 return
 
             if any(is_terminal_action(c) for c in calls):
                 print(f"[runner] terminal action at step {step}: {format_action(calls[0])}")
+                dashboard.publish({"type": "done", "total_steps": step})
                 return
 
             for c in calls:
                 label = format_action(c)
                 print(f"[runner] step {step}: {label}")
+                thumb_b64 = None
                 try:
                     annotated = annotate_screenshot(screenshot_url, c, step)
                     output_dir.mkdir(parents=True, exist_ok=True)
                     annotated.save(output_dir / f"step-{step:02d}-{c.get('type', 'x')}.png")
+                    thumb_b64 = _to_thumb_b64(annotated)
                 except Exception as e:
                     print(f"[runner] annotation failed (non-fatal): {e}")
+                dashboard.publish({
+                    "type": "step",
+                    "step": step,
+                    "action_label": label,
+                    "screenshot_b64": thumb_b64,
+                })
 
             computer.batch(calls)
             time.sleep(1)
@@ -149,3 +191,4 @@ def run(
                 })
 
         print(f"[runner] hit max_steps={max_steps}")
+        dashboard.publish({"type": "error", "message": f"hit max_steps={max_steps} without done"})

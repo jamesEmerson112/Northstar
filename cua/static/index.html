@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northstar (CUA) — Live</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>Northstar <span class="muted">(CUA)</span></h1>
+  <span id="status" class="status status-idle">IDLE</span>
+</header>
+<p id="task" class="task muted">waiting for a run…</p>
+
+<main>
+  <section class="screen">
+    <img id="latest" alt="latest annotated screenshot">
+    <p id="action" class="action muted">no action yet</p>
+  </section>
+  <aside class="side">
+    <h2>Transcript</h2>
+    <ol id="transcript"></ol>
+    <h2>Northstar says</h2>
+    <ul id="messages"></ul>
+  </aside>
+</main>
+
+<footer>
+  <h2>Steps</h2>
+  <div id="thumbs" class="thumbs"></div>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

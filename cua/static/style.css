@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, system-ui, sans-serif; background: #f5f5f7; color: #1d1d1f; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #fff; border-bottom: 1px solid #ddd; }
+header h1 { margin: 0; font-size: 1rem; }
+.muted { color: #888; font-weight: normal; }
+.task { margin: 8px 20px 0; font-size: 0.9rem; font-style: italic; }
+
+.status { padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.status-idle { background: #eee; color: #888; }
+.status-start, .status-step { background: #e0ecff; color: #36c; }
+.status-done { background: #d6f5e6; color: #2a8; }
+.status-error { background: #ffe1e1; color: #c33; }
+
+main { display: grid; grid-template-columns: 1fr 320px; gap: 16px; padding: 16px 20px; }
+.screen { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; min-height: 360px; display: flex; flex-direction: column; align-items: center; }
+.screen img { max-width: 100%; max-height: 60vh; border: 2px solid #36c; border-radius: 4px; background: #eee; }
+.action { margin-top: 8px; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+
+.side { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; max-height: 70vh; overflow-y: auto; }
+.side h2 { font-size: 0.85rem; margin: 0 0 6px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+.side ol, .side ul { margin: 0 0 12px; padding-left: 18px; font-size: 0.85rem; }
+.side ol li, .side ul li { font-family: ui-monospace, monospace; margin: 2px 0; word-wrap: break-word; }
+.side ul { list-style: square; }
+
+footer { padding: 12px 20px 20px; }
+footer h2 { font-size: 0.85rem; margin: 0 0 6px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+.thumbs { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
+.thumbs img { width: 96px; height: 54px; object-fit: cover; border: 1px solid #ccc; border-radius: 3px; flex-shrink: 0; cursor: pointer; }
+.thumbs img:hover { border-color: #36c; }
+
+@media (max-width: 800px) {
+  main { grid-template-columns: 1fr; }
+}

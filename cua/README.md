@@ -6,7 +6,7 @@ Standalone CUA orchestrator. Drives the public drone dashboard URL (`https://un5
 
 ```bash
 cd /Users/mrbam/Github/GitHub/Northstar
-pip install tzafon httpx Pillow
+pip install tzafon httpx Pillow fastapi uvicorn
 ```
 
 API key is read from `$LIGHTCONE_API_KEY`, `$TZAFON_API_KEY`, the legacy `$lightcone_API`, or `Northstar/.env` (in that order).
@@ -29,6 +29,29 @@ python -m cua --demo sf-tour --dashboard-url https://example.proxy.runpod.net --
 ```
 
 Annotated PNGs land in `Northstar/cua_runs/<timestamp>/step-NN-<action>.png`. The terminal prints each step and any text Northstar produces.
+
+## Live dashboard
+
+By default, `python -m cua --demo X` also boots a local viewer dashboard:
+
+- Opens your browser to **http://localhost:9090**.
+- Streams each step (annotated screenshot, action label, transcript) as it happens.
+- Surfaces Northstar's text reasoning ("Now I'll click the address bar…").
+- **Stays alive after the CUA finishes** so you can scrub through screenshots — Ctrl-C in the terminal to stop.
+
+Useful flags:
+
+```
+python -m cua --demo X --port 9091     # different port
+python -m cua --demo X --no-open       # don't auto-open browser
+python -m cua --demo X --no-dashboard  # skip the viewer entirely
+```
+
+The dashboard pairs nicely side-by-side with the drone dashboard:
+
+| Tab 1 | Tab 2 |
+|---|---|
+| `https://un5nmdhn7f29dw-8000.proxy.runpod.net/` (drone) | `http://localhost:9090` (Northstar's POV) |
 
 ## How it works
 
